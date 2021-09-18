@@ -1,0 +1,19 @@
+﻿<Window x:Class="DanmakuWPF.UI.DanmakuCurtain"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DanmakuWPF.UI"
+        mc:Ignorable="d"
+        Title="DanmakuCurtain"
+        Background="Transparent" 
+        AllowsTransparency="True" 
+        WindowStyle="None" 
+        ShowInTaskbar="False"
+        Left="0"
+        Top="0">
+
+    <Grid x:Name="curtain">
+
+    </Grid>
+</Window>

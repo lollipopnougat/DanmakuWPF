@@ -1,0 +1,73 @@
+﻿<hc:GlowWindow x:Class="DanmakuWPF.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:local="clr-namespace:DanmakuWPF.Utils" 
+        xmlns:ui="clr-namespace:DanmakuWPF.UI"
+               ActiveGlowColor="#2196f3"
+               InactiveGlowColor="Transparent"
+               mc:Ignorable="d"
+               Title="桌面弹幕" Height="480" Width="640" Closed="Window_Closed"
+               MinWidth="640"
+               MinHeight="450">
+    
+    <Grid>
+        <TextBox x:Name="serverUrl" Margin="24,24,24,0" Text="ws://localhost:3000" TextWrapping="Wrap" VerticalAlignment="Top" Height="32" FontSize="14" VerticalContentAlignment="Center"/>
+        <Button Content="设置服务器" HorizontalAlignment="Left" Margin="24,86,0,0" VerticalAlignment="Top" Click="serverBtn_Click" Height="32" Width="80" Background="#FF2196F3" Foreground="White" FontSize="12" Style="{StaticResource ButtonPrimary}" Cursor="Hand"/>
+        <Button x:Name="conBtn" Content="连接" HorizontalAlignment="Left" Margin="123,86,0,0" VerticalAlignment="Top" Click="conBtn_Click" Height="32" Width="80" Background="#FF2196F3" Foreground="White" FontSize="12" Style="{StaticResource ButtonPrimary}" Cursor="Hand">
+            <hc:Poptip.Instance>
+                <hc:Poptip Content="修改后记得点击设置服务器按钮" PlacementType="Right" Foreground="Black"/>
+            </hc:Poptip.Instance>
+        </Button>
+        <TextBox x:Name="danmakuTextBox"  Text="测试弹幕" TextWrapping="Wrap" VerticalAlignment="Top" Height="32" Margin="24,160,24,0"/>
+        <CheckBox x:Name="chkShadow" Content="阴影" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="True"  Margin="24,246,0,0"/>
+        <CheckBox x:Name="chkServer" Content="转发到服务器" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="False"  Margin="380,307,0,0">
+            <hc:Poptip.Instance>
+                <hc:Poptip Content="将输入的弹幕转发到服务端" PlacementType="BottomLeft" Foreground="Black"/>
+            </hc:Poptip.Instance>
+        </CheckBox>
+        <Button Content="发送弹幕" HorizontalAlignment="Left" VerticalAlignment="Top" Click="submitDanmaku_Click" Height="32" Width="150" FontSize="14" Margin="200,300,0,0" Background="#ff0EC665" Foreground="White" Style="{StaticResource ButtonPrimary}" Cursor="Hand"/>
+        <Button x:Name="topDanmakuBtn" Content="保持弹幕顶层" HorizontalAlignment="Left" VerticalAlignment="Top" Click="top_Click" Height="32" Width="135" FontSize="14" Margin="22,300,0,0" Background="#FF2196F3" Foreground="White" Style="{StaticResource ButtonPrimary}" Cursor="Hand">
+            <hc:Poptip.Instance>
+                <hc:Poptip Content="将所有弹幕显示在最上层" PlacementType="BottomLeft" Foreground="Black"/>
+            </hc:Poptip.Instance>
+        </Button>
+        <Ellipse x:Name="statusPoint" HorizontalAlignment="Left" Width="24" Margin="10,0,0,10" Stroke="Transparent" Fill="#E36464" Height="24" VerticalAlignment="Bottom"/>
+        <TextBlock x:Name="statusBlk" HorizontalAlignment="Left" Margin="49,0,0,15" Text="未连接" TextWrapping="Wrap" Height="15" VerticalAlignment="Bottom"/>
+        <Slider x:Name="fontSizeSlider" HorizontalAlignment="Left" Margin="140,245,0,0" VerticalAlignment="Top" Width="150" Maximum="42" LargeChange="4" Value="32" SmallChange="1" Minimum="16" IsSnapToTickEnabled="True"/>
+        <TextBlock HorizontalAlignment="Left" Margin="85,246,0,0" Text="大小" TextWrapping="Wrap" Height="15" VerticalAlignment="Top"/>
+        <TextBlock x:Name="sizeBlk" HorizontalAlignment="Left" Margin="115,246,0,0" Text="{Binding Path=Value, ElementName=fontSizeSlider}" TextWrapping="Wrap" Height="15" VerticalAlignment="Top"/>
+        <Rectangle HorizontalAlignment="Left" Height="30"  Width="30" Margin="302,240,0,0" Stroke="#e0e0e0" StrokeThickness="1" VerticalAlignment="Top" Fill="{Binding Path=SelectedBrush,ElementName=colorPicker}"/>
+        <Button x:Name="selectColorBtn" Content="选取颜色" HorizontalAlignment="Left" Margin="345,240,0,0" VerticalAlignment="Top" Click="selectColorBtn_Click" Cursor="Hand">
+            <hc:Poptip.Instance>
+                <hc:Poptip Content="取色快捷键 ALT+O" PlacementType="TopLeft" Foreground="Black"/>
+            </hc:Poptip.Instance>
+        </Button>
+        <Button x:Name="logBtn" Content="日志" HorizontalAlignment="Left" Margin="120,0,0,8" VerticalAlignment="Bottom" Click="logBtn_Click" Height="30">
+            <hc:Poptip.Instance>
+                <hc:Poptip Content="显示此程序的日志" PlacementType="TopLeft"/>
+            </hc:Poptip.Instance>
+        </Button>
+        <ComboBox x:Name="fontBox" HorizontalAlignment="Left" Margin="478,240,0,0" VerticalAlignment="Top" Width="120" ItemsSource="{Binding}"/>
+        <TextBlock HorizontalAlignment="Left" Margin="435,247,0,0" Text="字体" TextWrapping="Wrap" Height="15" VerticalAlignment="Top"/>
+        <hc:Drawer x:Name="DrawerRight" MaskCanClose="False">
+            <Border Background="{DynamicResource RegionBrush}" Width="450" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BorderBrush}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Margin="10,0,0,0" Text="日志" Style="{StaticResource TextBlockTitle}" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <Button Command="hc:ControlCommands.Close" Grid.Row="0" HorizontalAlignment="Right" Foreground="{DynamicResource PrimaryTextBrush}" Style="{StaticResource ButtonIcon}" hc:IconElement.Geometry="{StaticResource DeleteFillCircleGeometry}"/>
+                    <ListBox x:Name="logBox" Margin="15,10,0,0" HorizontalAlignment="Left" Grid.Row="1" Width="420"/>
+                    <!--<TextBlock x:Name="logBox" Margin="15,0,0,0" HorizontalAlignment="Left" Grid.Row="1" TextWrapping="Wrap"/>-->
+                </Grid>
+            </Border>
+        </hc:Drawer>
+        <hc:ColorPicker x:Name="colorPicker" Margin="185,43,0,0" Confirmed="colorPicker_Confirmed" Canceled="colorPicker_Canceled" HorizontalAlignment="Left" Width="230" Height="455" VerticalAlignment="Top" Visibility="Hidden"/>
+
+
+    </Grid>
+</hc:GlowWindow>

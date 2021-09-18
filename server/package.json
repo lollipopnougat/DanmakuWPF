@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "short-uuid": "^4.2.0",
+    "ws": "^8.2.2"
+  },
+  "name": "wsdemo",
+  "version": "1.0.0",
+  "description": "test ws",
+  "main": "index.js",
+  "devDependencies": {
+    "@types/ws": "^7.4.7",
+    "typescript": "^4.4.3"
+  },
+  "scripts": {
+    "test": "tsc && node client.js",
+    "dev": "tsc && node index.js"
+  },
+  "author": "lnp",
+  "license": "MIT"
+}
