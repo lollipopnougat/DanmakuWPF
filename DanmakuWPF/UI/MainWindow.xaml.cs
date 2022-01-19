@@ -36,11 +36,12 @@ namespace DanmakuWPF.UI
         private const int HOTKEY_PickColor = 102;
         //private const uint KEY_O = 79;
         private IntPtr handle;
+        private object loglock = new();
 
         public MainWindow()
         {
             InitializeComponent();
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
             {
                 dmkCurt = new DanmakuCurtain(chkShadow.IsChecked.Value);
                 dmkCurt.Show();
@@ -49,7 +50,7 @@ namespace DanmakuWPF.UI
                 wsclient.OnClose += websocket_OnClose;
                 wsclient.OnMessage += websocket_OnMessage;
                 wsclient.OnError += websocket_OnError;
-            }));
+            });
             picker = new ColorPicker(ChangeColor);
             fontBox.ItemsSource = infoData.FontsList;
             fontBox.SelectedIndex = 0;
@@ -64,6 +65,11 @@ namespace DanmakuWPF.UI
             picker.ReleaseScreen();
             WinService.UnregisterHotKey(handle, HOTKEY_PickColor);
             Application.Current.Shutdown();
+        }
+
+        private void DispInvoke(Action act)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, act);
         }
 
         #region 窗体消息预处理
@@ -155,10 +161,10 @@ namespace DanmakuWPF.UI
         /// <param name="b">蓝</param>
         public void ChangeColor(byte r, byte g, byte b)
         {
-            Dispatcher.Invoke(new Action(delegate
+            Dispatcher.Invoke(() =>
             {
                 colorPicker.SelectedBrush = new SolidColorBrush(Color.FromRgb(r, g, b));
-            }));
+            });
             //MessageBox.Show($"{r},{g},{b}", "");
         }
         #endregion
@@ -171,14 +177,14 @@ namespace DanmakuWPF.UI
             {
                 if (wsclient.State == WSStates.Open)
                 {
-                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
                     {
-                        logger.AddLog($"send server '{danmakuTextBox.Text}'.");
                         var font = (string)fontBox.SelectedItem;
                         var type = chkShadow.IsChecked.Value ? "shadow" : "outline";
                         var colorStr = ColorConvertor.ToHtml(selectedBrush);
                         wsclient.Send($"/send {{\"text\":\"{danmakuTextBox.Text}\",\"fontSize\":\"{(int)fontSizeSlider.Value}\",\"fill\":\"{colorStr}\",\"stroke\":\"#000000\",\"fontFamily\":\"{font}\",\"type\":\"{type}\"}}");
-                    }));
+                    });
+                    logger.AddLog($"send server '{danmakuTextBox.Text}'.");
                 }
                 else
                 {
@@ -204,23 +210,27 @@ namespace DanmakuWPF.UI
         // 连接按钮
         private void conBtn_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+            if (wsclient.State == WSStates.None || wsclient.State == WSStates.Closed)
             {
-                if (wsclient.State == WSStates.None || wsclient.State == WSStates.Closed)
+                logger.AddLog($"Start Connecting Server.");
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
                 {
-                    logger.AddLog($"Start Connecting Server.");
                     wsclient.Open();
-                }
-                else if (wsclient.State == WSStates.Open)
+                });
+            }
+            else if (wsclient.State == WSStates.Open)
+            {
+                DispInvoke(() => { logger.AddLog($"Stopping Connection."); });
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
                 {
-                    logger.AddLog($"Stopping Connection.");
                     wsclient.Close();
-                }
-                else if (wsclient.State == WSStates.Connecting)
-                {
-                    HandyControl.Controls.MessageBox.Show("休息一下吧，已经在连接了", "啊这...");
-                }
-            }));
+                });
+            }
+            else if (wsclient.State == WSStates.Connecting)
+            {
+                HandyControl.Controls.MessageBox.Show("休息一下吧，已经在连接了", "啊这...");
+            }
+
 
         }
 
@@ -291,10 +301,10 @@ namespace DanmakuWPF.UI
         {
             //statusPoint.Fill = greenBrush;
             logger.AddLog($"Connect to Server successful.");
-            statusPoint.Dispatcher.Invoke(new Action(delegate { statusPoint.Fill = greenBrush; }));
-            conBtn.Dispatcher.Invoke(new Action(delegate { conBtn.Background = redBrush; }));
-            statusBlk.Dispatcher.Invoke(new Action(delegate { statusBlk.Text = "已连接"; }));
-            conBtn.Dispatcher.Invoke(new Action(delegate { conBtn.Content = "断开连接"; }));
+            statusPoint.Dispatcher.Invoke(() => { statusPoint.Fill = greenBrush; });
+            conBtn.Dispatcher.Invoke(() => { conBtn.Background = redBrush; });
+            statusBlk.Dispatcher.Invoke(() => { statusBlk.Text = "已连接"; });
+            conBtn.Dispatcher.Invoke(() => { conBtn.Content = "断开连接"; });
             logger.AddLog($"Send Server '/danmaku'.");
             wsclient.Send("/danmaku");
             isReply = false;
@@ -309,33 +319,34 @@ namespace DanmakuWPF.UI
         private void websocket_OnMessage(object sender, string data)
         {
             logger.AddLog($"Receive {data}");
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+            if (data[0] == '{')
             {
-                if (data[0] == '{')
+                var info = DanmakuInfoHelper.FromJson(data);
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
                 {
-                    var info = DanmakuInfoHelper.FromJson(data);
                     dmkCurt.Shoot(info);
-                    logger.AddLog($"Shoot '{info.Text}'.");
-                }
-                else if (!isReply && data == "/ok")
-                {
-                    logger.AddLog($"Server has recognised this client.");
-                }
-                else
-                {
-                    logger.AddLog($"unrecognised request, just pass.");
-                    //dmkCurt.Shoot(data);
-                }
-            }));
+                });
+                logger.AddLog($"Shoot '{info.Text}'.");
+
+            }
+            else if (!isReply && data == "/ok")
+            {
+                logger.AddLog($"Server has recognised this client.");
+            }
+            else
+            {
+                logger.AddLog($"unrecognised request, just pass.");
+                //dmkCurt.Shoot(data);
+            }
         }
 
         private void websocket_OnClose(object sender, EventArgs e)
         {
             logger.AddLog($"Server Disconnected.");
-            statusPoint.Dispatcher.Invoke(new Action(delegate { statusPoint.Fill = redBrush; }));
-            conBtn.Dispatcher.Invoke(new Action(delegate { conBtn.Background = blueBrush; }));
-            statusBlk.Dispatcher.Invoke(new Action(delegate { statusBlk.Text = "未连接"; }));
-            conBtn.Dispatcher.Invoke(new Action(delegate { conBtn.Content = "连接"; }));
+            statusPoint.Dispatcher.Invoke(() => { statusPoint.Fill = redBrush; });
+            conBtn.Dispatcher.Invoke(() => { conBtn.Background = blueBrush; });
+            statusBlk.Dispatcher.Invoke(() => { statusBlk.Text = "未连接"; });
+            conBtn.Dispatcher.Invoke(() => { conBtn.Content = "连接"; });
 
         }
         #endregion

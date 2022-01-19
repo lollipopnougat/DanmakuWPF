@@ -1,26 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 namespace DanmakuWPF.Utils
 {
     class Logger
     {
-        private List<string> lines;
-        public List<string> Lines
+        
+        private ObservableCollection<string> lines;
+        public ObservableCollection<string> Lines
         {
             get
             {
-                return lines.ToList();
+                return lines;//.ToList();
             }
         }
 
+        private static object _syncLock = new object();
+
         private Logger()
         {
-            lines = new List<string>();
+            lines = new ObservableCollection<string>();
+            BindingOperations.EnableCollectionSynchronization(lines, _syncLock);
             AddLog("init Logger.");
         }
 
