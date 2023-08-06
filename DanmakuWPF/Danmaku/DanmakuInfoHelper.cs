@@ -37,16 +37,88 @@ namespace DanmakuWPF.Danmaku
                 return null;
             }
         }
-    }
 
-    /*
-     * {
-     *   "text": "aaabbb",
-     *   "fontSize": "16",
-     *   "fill": "#ffffff", 
-     *   "stroke": "#ffffff",
-     *   "fontFamily": "xxxx",
-     *   "type": "outline/shadow"
-     * }
-     */
+        private static Dictionary<string, string> ParseJson(string json)
+        {
+            var dict = new Dictionary<string, string>();
+            int state = 0;
+            var sb = new StringBuilder();
+            var key = "";
+            foreach (var ch in json)
+            {
+                switch (state)
+                {
+                    case 0:
+                        if (ch == '{')
+                        {
+                            state = 1;
+                        }
+                        break;
+                    case 1:
+                        if (ch == '"')
+                        {
+                            state = 2;
+                        }
+                        break;
+                    case 2:
+                        if (ch == '"')
+                        {
+                            key = sb.ToString();
+                            sb.Clear();
+                            state = 3;
+                        }
+                        else
+                        {
+                            sb.Append(ch);
+                        }
+                        break;
+                    case 3:
+                        if (ch == ':')
+                        {
+                            state = 4;
+                        }
+                        break;
+                    case 4:
+                        if (ch == '"')
+                        {
+                            state = 5;
+                        }
+                        break;
+                    case 5:
+                        if (ch == '"')
+                        {
+                            var value = sb.ToString();
+                            dict.Add(key, value);
+                            sb.Clear();
+                            state = 6;
+                        }
+                        else
+                        {
+                            sb.Append(ch);
+                        }
+                        break;
+                    case 6:
+                        if (ch == '}')
+                        {
+                            state = 7;
+                        }
+                        break;
+                    case 7:
+                        break;
+                }
+            }
+            return dict;
+        }
+
+        /*
+         * {
+         *   "text": "aaabbb",
+         *   "fontSize": "16",
+         *   "fill": "#ffffff", 
+         *   "stroke": "#ffffff",
+         *   "fontFamily": "xxxx",
+         *   "type": "outline/shadow"
+         * }
+         */
+    }
 }

@@ -26,9 +26,9 @@ namespace DanmakuWPF.Danmaku
             get => _fontSize;
             set 
             { 
-                if (value > 42)
+                if (value > 56)
                 {
-                    _fontSize = 42;
+                    _fontSize = 56;
                 }
                 else if(value < 16)
                 {

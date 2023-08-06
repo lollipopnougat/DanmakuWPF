@@ -64,6 +64,7 @@ namespace DanmakuWPF.UI
                 dm = new DanmakuManager(curtain, ShadowEffect);
             }
             dm = dm ?? new DanmakuManager(curtain, ShadowEffect);
+
             dm.Shoot(text);
         }
 

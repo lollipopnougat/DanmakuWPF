@@ -15,8 +15,8 @@
     
     <Grid>
         <TextBox x:Name="serverUrl" Margin="24,24,24,0" Text="ws://localhost:3000" TextWrapping="Wrap" VerticalAlignment="Top" Height="32" FontSize="14" VerticalContentAlignment="Center"/>
-        <Button Content="设置服务器" HorizontalAlignment="Left" Margin="24,86,0,0" VerticalAlignment="Top" Click="serverBtn_Click" Height="32" Width="80" Background="#FF2196F3" Foreground="White" FontSize="12" Style="{StaticResource ButtonPrimary}" Cursor="Hand"/>
-        <Button x:Name="conBtn" Content="连接" HorizontalAlignment="Left" Margin="123,86,0,0" VerticalAlignment="Top" Click="conBtn_Click" Height="32" Width="80" Background="#FF2196F3" Foreground="White" FontSize="12" Style="{StaticResource ButtonPrimary}" Cursor="Hand">
+        <!--<Button Content="设置服务器" HorizontalAlignment="Left" Margin="24,86,0,0" VerticalAlignment="Top" Click="serverBtn_Click" Height="32" Width="80" Background="#FF2196F3" Foreground="White" FontSize="12" Style="{StaticResource ButtonPrimary}" Cursor="Hand"/>-->
+        <Button x:Name="conBtn" Content="连接" HorizontalAlignment="Left" Margin="24,86,0,0" VerticalAlignment="Top" Click="conBtn_Click" Height="32" Width="80" Background="#FF2196F3" Foreground="White" FontSize="12" Style="{StaticResource ButtonPrimary}" Cursor="Hand">
             <hc:Poptip.Instance>
                 <hc:Poptip Content="修改后记得点击设置服务器按钮" PlacementType="Right" Foreground="Black"/>
             </hc:Poptip.Instance>
@@ -36,7 +36,7 @@
         </Button>
         <Ellipse x:Name="statusPoint" HorizontalAlignment="Left" Width="24" Margin="10,0,0,10" Stroke="Transparent" Fill="#E36464" Height="24" VerticalAlignment="Bottom"/>
         <TextBlock x:Name="statusBlk" HorizontalAlignment="Left" Margin="49,0,0,15" Text="未连接" TextWrapping="Wrap" Height="15" VerticalAlignment="Bottom"/>
-        <Slider x:Name="fontSizeSlider" HorizontalAlignment="Left" Margin="140,245,0,0" VerticalAlignment="Top" Width="150" Maximum="42" LargeChange="4" Value="32" SmallChange="1" Minimum="16" IsSnapToTickEnabled="True"/>
+        <Slider x:Name="fontSizeSlider" HorizontalAlignment="Left" Margin="140,245,0,0" VerticalAlignment="Top" Width="150" Maximum="56" LargeChange="4" Value="32" SmallChange="1" Minimum="16" IsSnapToTickEnabled="True"/>
         <TextBlock HorizontalAlignment="Left" Margin="85,246,0,0" Text="大小" TextWrapping="Wrap" Height="15" VerticalAlignment="Top"/>
         <TextBlock x:Name="sizeBlk" HorizontalAlignment="Left" Margin="115,246,0,0" Text="{Binding Path=Value, ElementName=fontSizeSlider}" TextWrapping="Wrap" Height="15" VerticalAlignment="Top"/>
         <Rectangle HorizontalAlignment="Left" Height="30"  Width="30" Margin="302,240,0,0" Stroke="#e0e0e0" StrokeThickness="1" VerticalAlignment="Top" Fill="{Binding Path=SelectedBrush,ElementName=colorPicker}"/>

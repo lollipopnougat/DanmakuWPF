@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows7.0</TargetFramework>
+    <TargetFrameworks>net6.0-windows;net48;net7.0-windows;net472</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <StartupObject>DanmakuWPF.App</StartupObject>
     <ApplicationIcon>danmakuwpf.ico</ApplicationIcon>
